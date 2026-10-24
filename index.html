@@ -1,0 +1,939 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 06 — Can I Help You?</title>
+<style>
+:root{
+  --ink:#19364a;--teal:#087d78;--mint:#e7f6f0;
+  --bg:#f1f5f7;--white:#fff;--line:#dbe5e9;
+  --muted:#63798a;--green:#087d55;--red:#b35648;
+  --gold:#f4c85b
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.65 Arial,sans-serif}
+button,select,input,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,
+textarea:focus-visible,input:focus-visible{
+outline:3px solid #77d4c7;outline-offset:2px}
+header{background:linear-gradient(115deg,#172e48,#126e72);
+color:white;padding:33px 5%;position:relative;overflow:hidden}
+header:after{content:"06";position:absolute;right:2%;
+top:-70px;font-size:250px;color:#ffffff0b;
+font-weight:900;pointer-events:none}
+.kicker{font-size:11px;letter-spacing:2px;
+text-transform:uppercase;font-weight:bold;color:#afe8dd}
+h1{font:700 clamp(35px,5vw,56px)/1.1 Georgia,serif;margin:10px 0}
+header p{margin:0;color:#d4e9e9}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.tags span{border:1px solid #ffffff55;border-radius:25px;
+padding:6px 11px;font-size:11px;font-weight:bold}
+nav{display:flex;gap:7px;overflow-x:auto;background:white;
+padding:12px 4%;border-bottom:1px solid var(--line)}
+nav button{border:1px solid var(--line);background:#f3f7f8;
+color:var(--ink);font-weight:bold;border-radius:9px;
+padding:10px 13px;white-space:nowrap;font-size:12px}
+nav button.active{background:var(--teal);color:white;
+border-color:var(--teal)}
+.progress{height:5px;background:#d5e1e5}
+.progress div{height:100%;width:12.5%;
+background:#12bbaa;transition:width .25s}
+main{max-width:1100px;margin:25px auto 100px;padding:0 16px}
+.slide{display:none}
+.slide.active{display:block}
+.panel{background:white;border:1px solid var(--line);
+border-radius:16px;padding:clamp(20px,4vw,38px)}
+.eyebrow{font-size:11px;font-weight:800;
+letter-spacing:1.5px;text-transform:uppercase;color:var(--teal)}
+h2{font:700 clamp(27px,4vw,39px)/1.2 Georgia,serif;margin:9px 0}
+h3{font-size:19px;margin:20px 0 10px}
+.lead{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.tile{background:#f5f8f9;border:1px solid var(--line);
+border-radius:12px;padding:18px}
+.tile h3{margin:0 0 8px}
+.tile p{margin:6px 0}
+.call{border-left:4px solid var(--teal);
+background:var(--mint);border-radius:0 10px 10px 0;
+padding:18px;margin:18px 0}
+.call strong{display:block;text-transform:uppercase;
+letter-spacing:1px;font-size:11px;color:var(--teal)}
+.call p{margin:7px 0;font-size:16px}
+.btn{background:var(--teal);color:white;border:0;
+border-radius:9px;padding:11px 16px;font-weight:bold;font-size:13px}
+.btn.alt{background:#e8eff1;color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin:17px 0}
+.small{font-size:12px;color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:25px 0}
+input[type=text],select,textarea{border:1px solid #cad8dd;
+border-radius:9px;background:white;padding:11px;
+color:var(--ink);width:100%}
+textarea{min-height:88px;resize:vertical}
+select{max-width:520px}
+.flashgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.flash{perspective:900px;border:0;background:transparent;
+padding:0;min-height:175px;color:inherit;text-align:left}
+.flashinner{position:relative;height:100%;
+min-height:175px;transform-style:preserve-3d;transition:transform .4s}
+.flash.turned .flashinner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;padding:17px;
+border-radius:13px;border:1px solid var(--line);
+display:flex;flex-direction:column;justify-content:center;
+backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.front{background:#f4f8fa}
+.back{transform:rotateY(180deg);background:#e0f4ec;
+border-color:#7ac4b6}
+.face small{color:var(--teal);font-size:10px;
+letter-spacing:1px;text-transform:uppercase;
+font-weight:800;margin-bottom:8px}
+.face strong{font-size:16px;line-height:1.35}
+.face p{margin:8px 0 0;font-size:12px;line-height:1.45}
+.question{padding:15px 0;border-bottom:1px solid var(--line)}
+.question label{display:block;font-weight:bold;margin-bottom:8px}
+.feedback{font-size:12px;font-weight:bold;margin-top:6px}
+.correct{color:var(--green)}.wrong{color:var(--red)}
+.score{color:var(--teal);font-weight:bold;margin:14px 0}
+.reveal{display:none;background:#f5f9f9;
+border:1px solid var(--line);border-radius:10px;
+padding:17px;margin:14px 0}
+.reveal.open{display:block}
+.bank{background:#edf7f5;border:1px solid #c6e0dc;
+padding:15px;border-radius:11px;margin:14px 0}
+.bank strong{display:block;font-size:11px;color:var(--teal);
+letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.model{background:#fdfdfb;border:1px solid var(--line);
+border-radius:12px;padding:24px;font:16px/1.9 Georgia,serif}
+.model p{margin:0 0 14px}
+.model p:last-child{margin-bottom:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:white;border:1px solid var(--line);
+border-radius:25px;padding:7px 11px;font-size:13px}
+.audio{background:#f5f9fa;border:1px solid var(--line);
+border-radius:12px;padding:16px}
+.audio audio{width:100%;margin:10px 0}
+.audio input{max-width:100%}
+.check{display:block;padding:12px;background:#f5f8f9;
+border:1px solid var(--line);border-radius:9px;margin:8px 0}
+.check input{accent-color:var(--teal);margin-right:9px}
+footer{position:fixed;bottom:0;left:0;right:0;
+background:white;border-top:1px solid var(--line);
+padding:12px 5%;display:flex;align-items:center;
+justify-content:space-between;z-index:5}
+footer span{font-size:12px;color:var(--muted)}
+@media(max-width:830px){.flashgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:610px){
+.grid,.flashgrid{grid-template-columns:1fr}
+.model{font-size:15px;padding:18px}
+nav{padding:10px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="kicker">English Course · Unit 2C · Homework</div>
+<h1>Can I Help You?</h1>
+<p>Shopping expressions · Comparatives · Real conversations</p>
+<div class="tags">
+<span>A2+ → B1</span>
+<span>CORE 40–50 MIN</span>
+<span>EXTRA CHALLENGE</span>
+<span>INTERACTIVE WORKBOOK</span>
+</div>
+</header>
+
+<div class="progress"><div id="bar"></div></div>
+
+<nav id="nav">
+<button>01 Start</button>
+<button>02 Key phrases</button>
+<button>03 Extra words</button>
+<button>04 Comparatives</button>
+<button>05 Practice</button>
+<button>06 Listening</button>
+<button>07 Reading</button>
+<button>08 Speaking & Finish</button>
+</nav>
+
+<main>
+
+<!-- 01 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">01 · Welcome</div>
+<h2>Ready to speak English in a shop?</h2>
+<p class="lead">This homework will help you remember useful language and become more confident in real conversations.</p>
+<div class="grid">
+<div class="tile">
+<h3>🛍️ Shop language</h3>
+<p>Learn how to ask for help, compare products and solve problems.</p>
+</div>
+<div class="tile">
+<h3>🧠 Smart vocabulary</h3>
+<p>Flip English–Russian cards and practise useful chunks.</p>
+</div>
+<div class="tile">
+<h3>🎧 Real conversations</h3>
+<p>Remember the five conversations from our lesson.</p>
+</div>
+<div class="tile">
+<h3>🎙️ Your speaking challenge</h3>
+<p>Prepare your own shopping dialogue.</p>
+</div>
+</div>
+<div class="call">
+<strong>Your goals</strong>
+<p>Remember at least six shopping expressions.</p>
+<p>Use three comparatives correctly.</p>
+<p>Explain a problem with a purchase in English.</p>
+</div>
+</div>
+</section>
+
+<!-- 02 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">02 · Core vocabulary</div>
+<h2>Shop phrases you'll really use</h2>
+<p class="lead">Read the English phrase first. Guess its meaning. Tap the card to see the translation and example.</p>
+<div id="coreCards" class="flashgrid"></div>
+<div class="actions">
+<button class="btn alt" onclick="resetCards('coreCards')">Turn all cards to English</button>
+</div>
+<hr>
+<h3>Quick speaking practice</h3>
+<div class="call">
+<strong>Say it in English</strong>
+<p>1. Извините, не могли бы вы мне помочь?</p>
+<p>2. У вас есть что-нибудь немного дешевле?</p>
+<p>3. Я купил это на днях.</p>
+<p>4. У вас есть такой в чёрном цвете?</p>
+</div>
+<div class="actions">
+<button class="btn alt" onclick="toggle('coreAnswers')">Show sample answers</button>
+</div>
+<div class="reveal" id="coreAnswers">
+<p>1. Excuse me. Could you help me?</p>
+<p>2. Do you have something a bit cheaper?</p>
+<p>3. I bought this the other day.</p>
+<p>4. Do you have one of these in black?</p>
+</div>
+</div>
+</section>
+
+<!-- 03 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">03 · Listening vocabulary</div>
+<h2>Extra expressions from the five shop conversations</h2>
+<p class="lead">These expressions appeared in the listening. You don't have to memorise them all today. Choose five that are new to you.</p>
+<div id="extraCards" class="flashgrid"></div>
+<div class="actions">
+<button class="btn alt" onclick="resetCards('extraCards')">Turn all cards to English</button>
+</div>
+<div class="call">
+<strong>Your five expressions</strong>
+<p>Choose five difficult expressions. Write one original sentence with each one.</p>
+</div>
+<textarea id="fiveSentences" rows="6"
+placeholder="1.
+2.
+3.
+4.
+5."></textarea>
+</div>
+</section>
+
+<!-- 04 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">04 · Grammar</div>
+<h2>Comparatives without confusion</h2>
+<p class="lead">Use comparatives when you want to say that one product is different from another.</p>
+
+<div class="grid">
+<div class="tile">
+<h3>1. Short adjectives</h3>
+<p>small → <b>smaller</b></p>
+<p>light → <b>lighter</b></p>
+<p>cheap → <b>cheaper</b></p>
+<p class="small">Для коротких прилагательных часто добавляем -er.</p>
+</div>
+<div class="tile">
+<h3>2. Ending in -y</h3>
+<p>easy → <b>easier</b></p>
+<p>heavy → <b>heavier</b></p>
+<p class="small">-y меняется на -ier.</p>
+</div>
+<div class="tile">
+<h3>3. Longer adjectives</h3>
+<p><b>more</b> comfortable</p>
+<p><b>less</b> expensive</p>
+<p><b>more</b> practical</p>
+<p class="small">Используем more / less перед прилагательным.</p>
+</div>
+<div class="tile">
+<h3>4. Irregular adjectives</h3>
+<p>good → <b>better</b></p>
+<p>bad → <b>worse</b></p>
+<p class="small">Эти формы нужно запомнить.</p>
+</div>
+</div>
+
+<div class="call">
+<strong>Important difference</strong>
+<p>These headphones are <b>a bit cheaper</b>. — Эти наушники немного дешевле.</p>
+<p>These headphones are <b>much cheaper</b>. — Эти наушники намного дешевле.</p>
+<p>This pair is cheaper <b>than</b> the other one. — Эта пара дешевле другой.</p>
+</div>
+
+<h3>Exercise 1 · Choose the correct form</h3>
+<div id="grammarQuiz"></div>
+<div class="actions">
+<button class="btn" onclick="grade('grammarQuiz',grammarQ,'grammarScore')">Check answers</button>
+<button class="btn alt" onclick="clearQuiz('grammarQuiz','grammarScore')">Try again</button>
+</div>
+<div class="score" id="grammarScore"></div>
+
+<hr>
+<h3>Pronunciation & speaking</h3>
+<p>Say the sentences aloud. Stress the words that show the difference.</p>
+<div class="tile">
+<p>1. This one's a bit <b>CHEAPER</b>.</p>
+<p>2. That one is <b>MUCH BETTER</b>.</p>
+<p>3. Do you have something a bit <b>BIGGER</b>?</p>
+<p>4. I need something <b>MORE PRACTICAL</b>.</p>
+</div>
+</div>
+</section>
+
+<!-- 05 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">05 · Vocabulary in use</div>
+<h2>Shopping situations</h2>
+<p class="lead">Choose the best expression for each situation.</p>
+
+<h3>Exercise 2 · What's the best phrase?</h3>
+<div id="situationsQuiz"></div>
+<div class="actions">
+<button class="btn" onclick="grade('situationsQuiz',situationQ,'situationsScore')">Check answers</button>
+<button class="btn alt" onclick="clearQuiz('situationsQuiz','situationsScore')">Try again</button>
+</div>
+<div class="score" id="situationsScore"></div>
+
+<hr>
+<h3>Exercise 3 · Translate into English</h3>
+<p class="small">Write your own answers before opening the examples. More than one natural answer may be possible.</p>
+<div id="translations"></div>
+<div class="actions">
+<button class="btn alt" onclick="toggle('translationAnswers')">Show sample translations</button>
+</div>
+<div class="reveal" id="translationAnswers"></div>
+
+<hr>
+<h3>Extra Challenge · Language upgrade</h3>
+<p>Make these simple sentences sound more natural.</p>
+<div id="upgrades"></div>
+<div class="actions">
+<button class="btn alt" onclick="toggle('upgradeAnswers')">Show sample upgrades</button>
+</div>
+<div class="reveal" id="upgradeAnswers"></div>
+</div>
+</section>
+
+<!-- 06 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">06 · Listening review</div>
+<h2>Remember the five conversations?</h2>
+<p class="lead">These tasks are based on the original shop conversations from Outcomes Unit 2C, Exercises 7–8.</p>
+
+<div class="audio">
+<strong>🎧 Optional: Listen again</strong>
+<p class="small">Choose the Unit 2C Exercises 7–8 MP3 file if you have it. No renaming is needed.</p>
+<input type="file" id="audioFile" accept="audio/*,.mp3">
+<audio id="audioPlayer" controls preload="metadata"></audio>
+<div id="audioStatus" class="small">You can also complete the tasks from memory.</div>
+</div>
+
+<h3>Exercise 4 · Match the conversations</h3>
+<p>Which situation happened in each conversation?</p>
+<div id="listeningQuiz"></div>
+<div class="actions">
+<button class="btn" onclick="grade('listeningQuiz',listeningQ,'listeningScore')">Check answers</button>
+<button class="btn alt" onclick="clearQuiz('listeningQuiz','listeningScore')">Try again</button>
+</div>
+<div class="score" id="listeningScore"></div>
+
+<hr>
+<h3>Exercise 5 · Complete useful expressions</h3>
+<div class="bank">
+<strong>Word bank</strong>
+stock · till · box · queue · receipt · grow · hurry · reduced
+</div>
+<div id="audioPhrasesQuiz"></div>
+<div class="actions">
+<button class="btn" onclick="grade('audioPhrasesQuiz',audioPhrasesQ,'audioPhrasesScore')">Check answers</button>
+<button class="btn alt" onclick="clearQuiz('audioPhrasesQuiz','audioPhrasesScore')">Try again</button>
+</div>
+<div class="score" id="audioPhrasesScore"></div>
+
+<div class="call">
+<strong>Think</strong>
+<p>Which situation was the most difficult for the customer?</p>
+<p>Did any shop assistant sound unfriendly? Why?</p>
+</div>
+</div>
+</section>
+
+<!-- 07 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">07 · Reading practice</div>
+<h2>The wrong size</h2>
+<p class="lead">Read a new story about a problem in a clothes shop.</p>
+
+<div class="model">
+<p>Last Saturday, I went shopping for a new jacket. I found a dark blue one that looked really nice. It was cheaper than the other jackets, so I decided to try it on.</p>
+
+<p>Unfortunately, it was a bit too small. I asked the shop assistant, “Excuse me. Do you have one of these in a bigger size?” She checked the computer, but my size was out of stock.</p>
+
+<p>Then she showed me another jacket. It was more expensive, but it was lighter and much more comfortable. It suited me better, too. I wasn't sure because I couldn't afford to spend much money.</p>
+
+<p>The assistant explained that the jacket was on sale, so the price was reduced. In the end, I bought it. I'm happy with my choice because it's practical and I can wear it every day.</p>
+</div>
+
+<p class="small">This is an additional practice story, not one of the original Outcomes listening conversations.</p>
+
+<div class="actions">
+<button class="btn alt" onclick="toggle('readingGlossary')">Difficult language · Перевод</button>
+</div>
+<div class="reveal" id="readingGlossary">
+<p><b>try it on</b> — примерить</p>
+<p><b>a bit too small</b> — немного маловат</p>
+<p><b>out of stock</b> — нет в наличии</p>
+<p><b>suited me better</b> — подходил мне больше</p>
+<p><b>couldn't afford</b> — не мог себе позволить</p>
+<p><b>on sale</b> — со скидкой / на распродаже</p>
+<p><b>the price was reduced</b> — цену снизили</p>
+<p><b>in the end</b> — в итоге</p>
+</div>
+
+<h3>Exercise 6 · Reading comprehension</h3>
+<div id="readingQuiz"></div>
+<div class="actions">
+<button class="btn" onclick="grade('readingQuiz',readingQ,'readingScore')">Check answers</button>
+<button class="btn alt" onclick="clearQuiz('readingQuiz','readingScore')">Try again</button>
+</div>
+<div class="score" id="readingScore"></div>
+
+<hr>
+<h3>Exercise 7 · Answer in complete sentences</h3>
+<div id="readingWritten"></div>
+</div>
+</section>
+
+<!-- 08 -->
+<section class="slide">
+<div class="panel">
+<div class="eyebrow">08 · Speaking & Finish</div>
+<h2>Can you solve a shopping problem?</h2>
+<p class="lead">Prepare a short dialogue. You can practise with a family member or record both roles using your phone.</p>
+
+<div class="call">
+<strong>Your situation</strong>
+<p>You bought a pair of trainers two days ago.</p>
+<p>They are uncomfortable and a bit too small.</p>
+<p>You want a bigger size, but the shop doesn't have it.</p>
+<p>Ask the shop assistant for a different solution.</p>
+</div>
+
+<div class="grid">
+<div class="tile">
+<h3>01 · Start politely</h3>
+<p>How will you ask for help?</p>
+<textarea id="speak1" placeholder="Keywords..."></textarea>
+</div>
+<div class="tile">
+<h3>02 · Explain the problem</h3>
+<p>What's wrong with the trainers?</p>
+<textarea id="speak2" placeholder="Keywords..."></textarea>
+</div>
+<div class="tile">
+<h3>03 · Compare options</h3>
+<p>What would be better?</p>
+<textarea id="speak3" placeholder="Keywords..."></textarea>
+</div>
+<div class="tile">
+<h3>04 · Agree on a solution</h3>
+<p>A refund, a replacement or another pair?</p>
+<textarea id="speak4" placeholder="Keywords..."></textarea>
+</div>
+</div>
+
+<div class="actions">
+<button class="btn" onclick="toggleNotes()">Hide / show speaking notes</button>
+<button class="btn alt" onclick="toggle('speakingSupport')">Useful phrases</button>
+</div>
+<div id="speakingSupport" class="reveal">
+<div class="chips">
+<span class="chip">Could you help me?</span>
+<span class="chip">I bought these the other day.</span>
+<span class="chip">They're a bit too small.</span>
+<span class="chip">Do you have anything bigger?</span>
+<span class="chip">Are they in stock?</span>
+<span class="chip">Could I get a refund?</span>
+</div>
+</div>
+
+<h3>Final self-check</h3>
+<label class="check"><input type="checkbox">I can ask for help politely.</label>
+<label class="check"><input type="checkbox">I know at least six shopping expressions.</label>
+<label class="check"><input type="checkbox">I can use comparatives correctly.</label>
+<label class="check"><input type="checkbox">I can explain a shopping problem.</label>
+<label class="check"><input type="checkbox">I can suggest or choose a solution.</label>
+
+<div class="call">
+<strong>Don't forget</strong>
+<p>Save your written answers before closing this page. This file doesn't upload your work automatically.</p>
+</div>
+
+<div class="actions">
+<button class="btn" onclick="saveAnswers()">Save written answers</button>
+<button class="btn alt" onclick="copyAnswers()">Copy written answers</button>
+</div>
+<div id="saveMessage" class="small" aria-live="polite"></div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<button class="btn alt" id="prev" onclick="move(-1)">← Previous</button>
+<span id="counter">1 / 8</span>
+<button class="btn" id="next" onclick="move(1)">Next →</button>
+</footer>
+
+<script>
+"use strict";
+
+/* Navigation */
+let current=0;
+const slides=[...document.querySelectorAll(".slide")];
+const nav=[...document.querySelectorAll("#nav button")];
+
+function render(){
+ slides.forEach((s,i)=>s.classList.toggle("active",i===current));
+ nav.forEach((b,i)=>b.classList.toggle("active",i===current));
+ document.getElementById("counter").textContent=
+ (current+1)+" / "+slides.length;
+ document.getElementById("bar").style.width=
+ ((current+1)/slides.length*100)+"%";
+ document.getElementById("prev").disabled=current===0;
+ document.getElementById("next").disabled=current===slides.length-1;
+ window.scrollTo(0,0);
+}
+function go(n){current=Math.max(0,Math.min(slides.length-1,n));render()}
+function move(n){go(current+n)}
+nav.forEach((b,i)=>b.addEventListener("click",()=>go(i)));
+function toggle(id){document.getElementById(id).classList.toggle("open")}
+
+/* Core shopping language */
+const core=[
+["Excuse me. Could you help me?",
+"Извините. Не могли бы вы мне помочь?",
+"Excuse me. Could you help me find a jacket?"],
+["Do you have one of these in ...?",
+"У вас есть такой в ...?",
+"Do you have one of these in black?"],
+["Do you have something a bit ...?",
+"У вас есть что-нибудь немного ...?",
+"Do you have something a bit cheaper?"],
+["Would you like me to ...?",
+"Хотите, чтобы я ...?",
+"Would you like me to order it?"],
+["Could I maybe ...?",
+"Могу я, может быть, ...?",
+"Could I maybe go ahead of you?"],
+["I bought this the other day.",
+"Я купил(а) это на днях.",
+"I bought this the other day and it doesn't work."],
+["Are you sure?",
+"Вы уверены?",
+"Are you sure it's out of stock?"],
+["Of course. Go ahead.",
+"Конечно. Пожалуйста / проходите.",
+"Yes, you can go first. Go ahead."],
+["out of stock",
+"нет в наличии",
+"Sorry, that size is out of stock."]
+];
+
+/* Chunks actually related to Unit 2C listening */
+const extra=[
+["grow into it",
+"дорасти до вещи, которая пока велика",
+"Don't worry. You'll grow into the jacket."],
+["at a reduced price",
+"по сниженной цене",
+"The coat was at a reduced price."],
+["a gift bag",
+"подарочный пакет",
+"Would you like a gift bag?"],
+["queue again",
+"снова стоять в очереди",
+"You don't need to queue again."],
+["get rid of the box",
+"избавиться от коробки",
+"I got rid of the box, but I kept the receipt."],
+["a receipt",
+"чек",
+"Have you got the receipt?"],
+["the till",
+"касса",
+"I'm closing the till."],
+["on display",
+"выставленный на витрине / в торговом зале",
+"Is that TV on display for sale?"],
+["in stock",
+"в наличии",
+"Is this model in stock?"],
+["in a hurry",
+"спешить",
+"Sorry, I'm in a hurry."],
+["suit someone",
+"идти кому-то, подходить по стилю",
+"This jacket really suits you."],
+["drop something",
+"уронить что-либо",
+"Did you drop it?"],
+["it's not fair",
+"это нечестно",
+"It's not fair! I don't like this one."],
+["a replacement",
+"замена товара",
+"Could I get a replacement, please?"],
+["a refund",
+"возврат денег",
+"I'd like a refund, please."]
+];
+
+function makeCards(id,data){
+ const area=document.getElementById(id);
+ data.forEach(([en,ru,example])=>{
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="flash";
+  button.setAttribute("aria-pressed","false");
+  button.innerHTML=
+  '<div class="flashinner">'+
+  '<div class="face front"><small>English · Tap to translate</small><strong></strong></div>'+
+  '<div class="face back"><small>Русский перевод</small><strong></strong><p></p></div>'+
+  '</div>';
+  button.querySelector(".front strong").textContent=en;
+  button.querySelector(".back strong").textContent=ru;
+  button.querySelector(".back p").textContent=example;
+  button.addEventListener("click",()=>{
+   button.classList.toggle("turned");
+   button.setAttribute("aria-pressed",
+   String(button.classList.contains("turned")));
+  });
+  area.appendChild(button);
+ });
+}
+makeCards("coreCards",core);
+makeCards("extraCards",extra);
+
+function resetCards(id){
+ document.querySelectorAll("#"+id+" .flash").forEach(c=>{
+  c.classList.remove("turned");
+  c.setAttribute("aria-pressed","false");
+ });
+}
+
+/* Interactive exercises */
+const grammarQ=[
+["This pair is ___ than that pair. (cheap)",
+["cheaper","more cheap","cheapest"],0],
+["These shoes are ___ than the old ones. (comfortable)",
+["comfortabler","more comfortable","most comfortable"],1],
+["The first laptop is ___ than the second. (good)",
+["more good","gooder","better"],2],
+["Do you have something a bit ___? (small)",
+["smaller","more small","smallest"],0],
+["This shopping centre is much ___ than the other one. (busy)",
+["busyer","busier","more busy"],1],
+["A backpack is ___ than a small handbag for travelling. (practical)",
+["practicaler","more practical","most practical"],1],
+["These trainers are ___ than my old ones. (light)",
+["more light","lighter","lightest"],1],
+["This jacket is ___ expensive than that one.",
+["more","many","most"],0]
+];
+
+const situationQ=[
+["You need help finding a jacket.",
+["Could you help me, please?","I don't like you.","It's not fair."],0],
+["The trainers are too expensive.",
+["Do you have anything a bit cheaper?","Do you have anything a bit older?","Would you like me to buy it?"],0],
+["You want the same hoodie in black.",
+["Do you have one of these in black?","Do you have a black review?","Is it more black?"],0],
+["You bought headphones yesterday. They don't work.",
+["I bought these the other day and they don't work.","This is a lovely shop.","I'd like a gift bag."],0],
+["You want the shop to return your money.",
+["I'd like a refund, please.","I need a queue, please.","I want to be in stock."],0],
+["You only have one item and someone is ahead of you.",
+["Could I maybe go ahead of you?","Could I maybe grow into it?","Could I maybe return the till?"],0]
+];
+
+const listeningQ=[
+["Conversation 1",
+["Buying a present","Arguing about clothes","Returning a product","A queue problem"],1],
+["Conversation 2",
+["Buying a present","A complaint about service","Not buying a TV","A queue problem"],0],
+["Conversation 3",
+["Buying clothes","Returning a damaged item","Buying a birthday present","Ordering a TV"],1],
+["Conversation 4",
+["Deciding not to buy a TV","A problem in a queue","Buying clothes","Returning headphones"],0],
+["Conversation 5",
+["Buying a present","Arguing about a coat","Asking to go first in a queue","Returning a damaged item"],2]
+];
+
+const audioPhrasesQ=[
+["The TV wasn't in ___.",
+["stock","till","queue"],0],
+["I got rid of the ___, but I kept the receipt.",
+["hurry","box","till"],1],
+["Would you like to ___ into it?",
+["grow","stock","receipt"],0],
+["I'm closing the ___.",
+["queue","till","reduced"],1],
+["I suddenly realised I was in a ___.",
+["hurry","receipt","stock"],0],
+["Have you got the ___?",
+["receipt","reduced","queue"],0],
+["The clothes were at a ___ price.",
+["box","reduced","grow"],1],
+["You don't need to ___ again.",
+["queue","grow","stock"],0]
+];
+
+const readingQ=[
+["Why did the person choose the first jacket?",
+["It looked nice and was cheaper.","It was the biggest jacket.","It was a present."],0],
+["What was wrong with the first jacket?",
+["It was too small.","It was damaged.","It was the wrong colour."],0],
+["Why couldn't the assistant get the correct size?",
+["It was out of stock.","The shop was closing.","It was too expensive."],0],
+["How was the second jacket different?",
+["It was cheaper and heavier.","It was lighter and more comfortable.","It was smaller and darker."],1],
+["Why did the customer finally buy it?",
+["It was reduced in price and practical.","The assistant was angry.","It was free."],0]
+];
+
+function buildQuiz(id,data){
+ const area=document.getElementById(id);
+ data.forEach((q,i)=>{
+  const row=document.createElement("div");
+  row.className="question";
+  const label=document.createElement("label");
+  label.textContent=(i+1)+". "+q[0];
+  const select=document.createElement("select");
+  const blank=document.createElement("option");
+  blank.value="";blank.textContent="Choose...";
+  select.appendChild(blank);
+  q[1].forEach((choice,j)=>{
+   const opt=document.createElement("option");
+   opt.value=String(j);opt.textContent=choice;
+   select.appendChild(opt);
+  });
+  const fb=document.createElement("div");
+  fb.className="feedback";
+  row.append(label,select,fb);
+  area.appendChild(row);
+ });
+}
+buildQuiz("grammarQuiz",grammarQ);
+buildQuiz("situationsQuiz",situationQ);
+buildQuiz("listeningQuiz",listeningQ);
+buildQuiz("audioPhrasesQuiz",audioPhrasesQ);
+buildQuiz("readingQuiz",readingQ);
+
+function grade(id,data,scoreId){
+ let score=0;
+ let answered=0;
+ document.querySelectorAll("#"+id+" .question").forEach((row,i)=>{
+  const select=row.querySelector("select");
+  const fb=row.querySelector(".feedback");
+  if(select.value!=="")answered++;
+  const ok=select.value!==""&&Number(select.value)===data[i][2];
+  if(ok)score++;
+  fb.className="feedback "+(ok?"correct":"wrong");
+  fb.textContent=select.value===""?
+   "Choose an answer.":ok?"✓ Correct!":"Try again.";
+ });
+ document.getElementById(scoreId).textContent=
+ "Score: "+score+" / "+data.length+
+ (answered<data.length?" — Complete the remaining questions.":"");
+}
+function clearQuiz(id,scoreId){
+ document.querySelectorAll("#"+id+" .question").forEach(row=>{
+  row.querySelector("select").value="";
+  row.querySelector(".feedback").textContent="";
+ });
+ document.getElementById(scoreId).textContent="";
+}
+
+/* Writing exercises */
+function makeWritten(id,questions){
+ const area=document.getElementById(id);
+ questions.forEach((q,i)=>{
+  const row=document.createElement("div");
+  row.className="question";
+  const label=document.createElement("label");
+  label.textContent=(i+1)+". "+q;
+  const text=document.createElement("textarea");
+  text.className="written";
+  text.rows=2;
+  text.placeholder="Write your answer...";
+  row.append(label,text);
+  area.appendChild(row);
+ });
+}
+
+const translations=[
+"Извините, не могли бы вы мне помочь?",
+"У вас есть что-нибудь немного дешевле?",
+"Я купила это на днях, но оно не работает.",
+"У вас есть такой в размере побольше?",
+"Этого товара нет в наличии.",
+"Можно мне, пожалуйста, возврат денег?",
+"Этот вариант намного удобнее.",
+"Извините, я спешу."
+];
+const translationModels=[
+"Excuse me. Could you help me?",
+"Do you have something a bit cheaper?",
+"I bought this the other day, but it doesn't work.",
+"Do you have one of these in a bigger size?",
+"It's out of stock.",
+"Could I have a refund, please?",
+"This one is much more comfortable.",
+"Sorry, I'm in a hurry."
+];
+makeWritten("translations",translations);
+
+const upgrades=[
+"This jacket is more cheap.",
+"I want a bigger one. Help me.",
+"The headphones are broken. Give me money.",
+"This coat is good than that coat.",
+"You have this in blue?",
+"I bought it two days ago. It doesn't work."
+];
+const upgradeModels=[
+"This jacket is cheaper.",
+"Excuse me. Could you help me find a bigger one?",
+"The headphones don't work. Could I have a refund, please?",
+"This coat is better than that one.",
+"Do you have one of these in blue?",
+"I bought this the other day, but it doesn't work."
+];
+makeWritten("upgrades",upgrades);
+
+const readingWritten=[
+"How did the customer feel about the first jacket?",
+"Which jacket would you choose? Why?",
+"Write two comparisons about the jackets.",
+"What would you say if your size was out of stock?"
+];
+makeWritten("readingWritten",readingWritten);
+
+function writeModels(id,answers){
+ const element=document.getElementById(id);
+ const title=document.createElement("strong");
+ title.textContent="Possible answers";
+ const list=document.createElement("ol");
+ answers.forEach(answer=>{
+  const li=document.createElement("li");
+  li.textContent=answer;
+  list.appendChild(li);
+ });
+ element.append(title,list);
+}
+writeModels("translationAnswers",translationModels);
+writeModels("upgradeAnswers",upgradeModels);
+
+/* Optional local audio */
+let audioURL=null;
+document.getElementById("audioFile").addEventListener("change",e=>{
+ const file=e.target.files&&e.target.files[0];
+ if(!file)return;
+ if(audioURL)URL.revokeObjectURL(audioURL);
+ audioURL=URL.createObjectURL(file);
+ const player=document.getElementById("audioPlayer");
+ player.src=audioURL;
+ player.load();
+ document.getElementById("audioStatus").textContent=
+ "Audio ready: "+file.name;
+});
+
+/* Speaking notes */
+let notesHidden=false;
+function toggleNotes(){
+ notesHidden=!notesHidden;
+ ["speak1","speak2","speak3","speak4"].forEach(id=>{
+  document.getElementById(id).style.display=
+    notesHidden?"none":"block";
+ });
+}
+
+/* Export written work */
+function collectAnswers(){
+ const sections=[
+ ["FIVE NEW EXPRESSIONS",[document.getElementById("fiveSentences").value]],
+ ["TRANSLATIONS",Array.from(document.querySelectorAll("#translations textarea")).map(x=>x.value)],
+ ["LANGUAGE UPGRADE",Array.from(document.querySelectorAll("#upgrades textarea")).map(x=>x.value)],
+ ["READING ANSWERS",Array.from(document.querySelectorAll("#readingWritten textarea")).map(x=>x.value)],
+ ["SPEAKING NOTES",["speak1","speak2","speak3","speak4"].map(id=>document.getElementById(id).value)]
+ ];
+ return "HOMEWORK 06 — CAN I HELP YOU?\n\n"+
+ sections.map(([title,items])=>
+ title+"\n"+items.map((x,i)=>(i+1)+". "+(x||"—")).join("\n")
+ ).join("\n\n");
+}
+function saveAnswers(){
+ const blob=new Blob(["\ufeff"+collectAnswers()],{
+  type:"text/plain;charset=utf-8"
+ });
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="Homework_06_Answers.txt";
+ document.body.appendChild(a);
+ a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+ document.getElementById("saveMessage").textContent=
+ "Your answers have been prepared as a text file.";
+}
+async function copyAnswers(){
+ try{
+  await navigator.clipboard.writeText(collectAnswers());
+  document.getElementById("saveMessage").textContent=
+  "Your written answers have been copied.";
+ }catch(e){
+  document.getElementById("saveMessage").textContent=
+  "Use Save written answers instead.";
+ }
+}
+
+render();
+</script>
+</body>
+</html>
